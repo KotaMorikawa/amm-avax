@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--foreground-rgb: 255, 255, 255;
+		--background-start-rgb: 0, 0, 0;
+		--background-end-rgb: 0, 0, 0;
+	}
+}
+
+body {
+	color: rgb(var(--foreground-rgb));
+	background: linear-gradient(
+			to bottom,
+			transparent,
+			rgb(var(--background-end-rgb))
+		)
+		rgb(var(--background-start-rgb));
+}
+
+@layer components {
+	.tabStyle {
+		@apply text-center w-20 px-5 py-2 text-white flex items-center justify-center mt-8 rounded-lg cursor-pointer;
+	}
+
+	.activeTab {
+		@apply bg-blue-500;
+	}
+
+	@media only screen and (min-width: 1180px) {
+		.mainBody {
+			@apply flex;
+		}
+	}
+
+	.textField:focus-visible {
+		@apply outline-none;
+	}
+
+	.pageBody {
+		@apply h-screen;
+	}
+
+	.connectBtn:hover {
+		@apply border-red-600;
+	}
+
+	.connected {
+		@apply bg-gray-700;
+	}
+
+	.details {
+		@apply p-4;
+		width: 370px;
+		height: -webkit-fit-content;
+		height: -moz-fit-content;
+		height: fit-content;
+		position: absolute;
+		right: 0px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.detailsBody {
+		@apply bg-gray-900;
+		width: 90%;
+		padding: 10px;
+		border-radius: 19px;
+	}
+
+	.detailsHeader {
+		@apply text-white;
+		height: 30px;
+		font-size: 20px;
+		font-weight: 600;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 15px;
+	}
+
+	.detailsRow {
+		@apply p-0;
+		height: 35px;
+		display: flex;
+		justify-content: space-around;
+	}
+
+	.detailsAttribute {
+		@apply text-white;
+		font-size: 18px;
+		font-weight: 600;
+		display: flex;
+		justify-content: flex-start;
+		width: 50%;
+	}
+
+	.detailsValue {
+		@apply text-white;
+		font-size: 18px;
+		font-weight: 900;
+		display: flex;
+		justify-content: center;
+		width: 50%;
+	}
+
+	.tabBody {
+		@apply mx-auto;
+		width: 460px;
+		padding-top: 5px;
+		justify-content: center;
+		align-items: center;
+		background-color: #0e0e10;
+		border-radius: 0px 0px 19px 19px;
+		border-top: 0px;
+	}
+
+	.bottomDiv {
+		@apply mx-auto;
+		width: 30%;
+		padding: 5px;
+		justify-content: center;
+		align-items: center;
+		border-radius: 19px;
+	}
+
+	.btn {
+		@apply bg-blue-500;
+		margin: 10px 30px;
+		color: white;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 18px;
+		width: 100px;
+		height: 40px;
+		border-radius: 9px;
+		cursor: pointer;
+	}
+
+	.btn:hover {
+		background: #57adea;
+	}
+
+	.swapIcon {
+		width: 5%;
+		text-align: center;
+		display: flex;
+		margin: 40px auto;
+		color: #ff726e;
+	}
+
+	.estimate {
+		height: 30px;
+		width: 75%;
+		margin: 0px auto;
+		margin-top: 10px;
+		margin-bottom: 30px;
+		color: white;
+	}
+
+	.error {
+		color: white;
+		display: flex;
+		justify-content: flex-start;
+		padding: 0px 20px;
+	}
+}
