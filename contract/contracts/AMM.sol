@@ -35,11 +35,10 @@ contract AMM {
 
     modifier validTokens(IERC20 tokenX, IERC20 tokenY) {
         require(
-            tokenX == _tokenX || tokenY == _tokenY,
-            "Token is not in the pool"
-        );
-        require(
-            tokenY == _tokenX || tokenY == _tokenY,
+            tokenX == _tokenX ||
+                tokenY == _tokenY ||
+                tokenY == _tokenX ||
+                tokenY == _tokenY,
             "Token is not in the pool"
         );
         require(tokenX != tokenY, "Tokens should be different!");
@@ -132,5 +131,51 @@ contract AMM {
         _tokenY.transfer(msg.sender, amountTokenY);
 
         return (amountTokenX, amountTokenY);
+    }
+
+    function getSwapEstimateOut(
+        IERC20 inToken,
+        uint256 amountIn
+    ) public view activePool validToken(inToken) returns (uint256) {
+        IERC20 outToken = _pairToken(inToken);
+
+        uint256 amountInWithFee = amountIn * 997;
+
+        uint256 numerator = amountInWithFee * totalAmount[outToken];
+        uint256 denominator = totalAmount[inToken] * 1000 + amountInWithFee;
+        uint256 amountOut = numerator / denominator;
+
+        return amountOut;
+    }
+
+    function getSwapEstimateIn(
+        IERC20 outToken,
+        uint256 amountOut
+    ) public view activePool validToken(outToken) returns (uint256) {
+        require(amountOut < totalAmount[outToken], "Insufficient pool balance");
+        IERC20 inToken = _pairToken(outToken);
+
+        uint256 numerator = 1000 * totalAmount[inToken] * amountOut;
+        uint256 denominator = 997 * (totalAmount[outToken] - amountOut);
+        uint256 amountIn = numerator / denominator;
+
+        return amountIn;
+    }
+
+    function swap(
+        IERC20 inToken,
+        IERC20 outToken,
+        uint256 amountIn
+    ) external activePool validTokens(inToken, outToken) returns (uint256) {
+        require(amountIn > 0, "Amount cannot be zero!");
+
+        uint256 amountOut = getSwapEstimateOut(inToken, amountIn);
+
+        inToken.transferFrom(msg.sender, address(this), amountIn);
+        totalAmount[inToken] += amountIn;
+        totalAmount[outToken] -= amountOut;
+        outToken.transfer(msg.sender, amountOut);
+
+        return amountOut;
     }
 }

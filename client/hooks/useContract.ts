@@ -9,9 +9,9 @@ import { getEthereum } from "@/utils/ethereum";
 import UsdcArtifact from "@/utils/USDCToken.json";
 import JoeArtifact from "@/utils/JOEToken.json";
 
-export const UsdcAddress = "0x19F6b0Ff76CAB83E812d127Db4f78f972857fA1d";
-export const JoeAddress = "0x43466B8757c77620191F80935649E3fa8ffCFc4A";
-export const AmmAddress = "0x5BeF990c7aea20F28f7CC4fdC42A5f6A4Ee0e2d5";
+export const UsdcAddress = "0xAd3Ba372bCC2D6F0F08FE4d54186a4dd1D7Ce3DC";
+export const JoeAddress = "0x0Bb7E58E57114483B3453bf5031E45c23Fa1287B";
+export const AmmAddress = "0x4f96749E9D8FC504A8D1402e5d6E1E9c4F38b433";
 
 export type TokenType = {
 	symbol: string;

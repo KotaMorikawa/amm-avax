@@ -27,9 +27,12 @@ export interface AMMInterface extends utils.Interface {
   functions: {
     "PRECISION()": FunctionFragment;
     "getEquivalentToken(address,uint256)": FunctionFragment;
+    "getSwapEstimateIn(address,uint256)": FunctionFragment;
+    "getSwapEstimateOut(address,uint256)": FunctionFragment;
     "getWithdrawEstimate(address,uint256)": FunctionFragment;
     "provide(address,uint256,address,uint256)": FunctionFragment;
     "share(address)": FunctionFragment;
+    "swap(address,address,uint256)": FunctionFragment;
     "totalAmount(address)": FunctionFragment;
     "totalShare()": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
@@ -39,9 +42,12 @@ export interface AMMInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "PRECISION"
       | "getEquivalentToken"
+      | "getSwapEstimateIn"
+      | "getSwapEstimateOut"
       | "getWithdrawEstimate"
       | "provide"
       | "share"
+      | "swap"
       | "totalAmount"
       | "totalShare"
       | "withdraw"
@@ -50,6 +56,14 @@ export interface AMMInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "PRECISION", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getEquivalentToken",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getSwapEstimateIn",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getSwapEstimateOut",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -70,6 +84,14 @@ export interface AMMInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "swap",
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<string>,
+      PromiseOrValue<BigNumberish>
+    ]
+  ): string;
+  encodeFunctionData(
     functionFragment: "totalAmount",
     values: [PromiseOrValue<string>]
   ): string;
@@ -88,11 +110,20 @@ export interface AMMInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getSwapEstimateIn",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getSwapEstimateOut",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getWithdrawEstimate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "provide", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "share", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalAmount",
     data: BytesLike
@@ -138,6 +169,18 @@ export interface AMM extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    getSwapEstimateIn(
+      outToken: PromiseOrValue<string>,
+      amountOut: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getSwapEstimateOut(
+      inToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     getWithdrawEstimate(
       token: PromiseOrValue<string>,
       _share: PromiseOrValue<BigNumberish>,
@@ -157,6 +200,13 @@ export interface AMM extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    swap(
+      inToken: PromiseOrValue<string>,
+      outToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     totalAmount(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -173,6 +223,18 @@ export interface AMM extends BaseContract {
   PRECISION(overrides?: CallOverrides): Promise<BigNumber>;
 
   getEquivalentToken(
+    inToken: PromiseOrValue<string>,
+    amountIn: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getSwapEstimateIn(
+    outToken: PromiseOrValue<string>,
+    amountOut: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getSwapEstimateOut(
     inToken: PromiseOrValue<string>,
     amountIn: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -197,6 +259,13 @@ export interface AMM extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  swap(
+    inToken: PromiseOrValue<string>,
+    outToken: PromiseOrValue<string>,
+    amountIn: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   totalAmount(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
@@ -218,6 +287,18 @@ export interface AMM extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getSwapEstimateIn(
+      outToken: PromiseOrValue<string>,
+      amountOut: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getSwapEstimateOut(
+      inToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getWithdrawEstimate(
       token: PromiseOrValue<string>,
       _share: PromiseOrValue<BigNumberish>,
@@ -234,6 +315,13 @@ export interface AMM extends BaseContract {
 
     share(
       arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    swap(
+      inToken: PromiseOrValue<string>,
+      outToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -261,6 +349,18 @@ export interface AMM extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getSwapEstimateIn(
+      outToken: PromiseOrValue<string>,
+      amountOut: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getSwapEstimateOut(
+      inToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getWithdrawEstimate(
       token: PromiseOrValue<string>,
       _share: PromiseOrValue<BigNumberish>,
@@ -278,6 +378,13 @@ export interface AMM extends BaseContract {
     share(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    swap(
+      inToken: PromiseOrValue<string>,
+      outToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     totalAmount(
@@ -302,6 +409,18 @@ export interface AMM extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getSwapEstimateIn(
+      outToken: PromiseOrValue<string>,
+      amountOut: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getSwapEstimateOut(
+      inToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getWithdrawEstimate(
       token: PromiseOrValue<string>,
       _share: PromiseOrValue<BigNumberish>,
@@ -319,6 +438,13 @@ export interface AMM extends BaseContract {
     share(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    swap(
+      inToken: PromiseOrValue<string>,
+      outToken: PromiseOrValue<string>,
+      amountIn: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     totalAmount(

@@ -1,7 +1,7 @@
-import { ethers } from "hardhat";
-import { expect } from "chai";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { expect } from "chai";
 import { BigNumber } from "ethers";
+import { ethers } from "hardhat";
 
 describe("AMM", function () {
 	async function deployContract() {
@@ -19,7 +19,13 @@ describe("AMM", function () {
 		const AMM = await ethers.getContractFactory("AMM");
 		const amm = await AMM.deploy(usdc.address, joe.address);
 
-		return { amm, token0: usdc, token1: joe, owner, otherAccount };
+		return {
+			amm,
+			token0: usdc,
+			token1: joe,
+			owner,
+			otherAccount,
+		};
 	}
 
 	describe("provide", function () {
@@ -32,8 +38,6 @@ describe("AMM", function () {
 			const ammBalance0Before = await token0.balanceOf(amm.address);
 			const ammBalance1Before = await token1.balanceOf(amm.address);
 
-			// 今回使用する2つのトークンはETHと同じ単位を使用するとしているので,
-			// 100 ether (= 100 * 10^18) 分をprovideするという意味です。
 			const amountProvide0 = ethers.utils.parseEther("100");
 			const amountProvide1 = ethers.utils.parseEther("200");
 
@@ -110,6 +114,7 @@ describe("AMM", function () {
 		};
 	}
 
+	// deployContractWithLiquidity 後の初期値のチェックをします。
 	describe("Deploy with liquidity", function () {
 		it("Should set the right number of amm details", async function () {
 			const {
@@ -125,8 +130,8 @@ describe("AMM", function () {
 			} = await loadFixture(deployContractWithLiquidity);
 
 			const precision = await amm.PRECISION();
-			const BN100 = BigNumber.from("100"); // ownerのシェア: 最初の流動性提供者なので100
-			const BN10 = BigNumber.from("10"); // otherAccountのシェア: ownerに比べて10分の1だけ提供しているので10
+			const BN100 = BigNumber.from("100");
+			const BN10 = BigNumber.from("10");
 
 			expect(await amm.totalShare()).to.equal(BN100.add(BN10).mul(precision));
 			expect(await amm.share(owner.address)).to.equal(BN100.mul(precision));
@@ -171,6 +176,7 @@ describe("AMM", function () {
 				otherAccount,
 			} = await loadFixture(deployContractWithLiquidity);
 
+			// otherAccountが全てのシェア分引き出し
 			const share = await amm.share(otherAccount.address);
 
 			expect(await amm.getWithdrawEstimate(token0.address, share)).to.eql(
@@ -243,6 +249,130 @@ describe("AMM", function () {
 			);
 			expect(await amm.totalAmount(token1.address)).to.equal(
 				amountOwnerProvided1
+			);
+		});
+	});
+
+	describe("getSwapEstimateOut", function () {
+		it("Should get the right number of token", async function () {
+			const { amm, token0, token1 } = await loadFixture(
+				deployContractWithLiquidity
+			);
+
+			const totalToken0 = await amm.totalAmount(token0.address);
+			const totalToken1 = await amm.totalAmount(token1.address);
+
+			const amountInToken0 = ethers.utils.parseEther("10");
+			// basic formula: k = x * y
+			// fee = 0.3%
+			const amountInToken0WithFee = amountInToken0.mul(997);
+			const amountReceiveToken1 = amountInToken0WithFee
+				.mul(totalToken1)
+				.div(totalToken0.mul(1000).add(amountInToken0WithFee));
+
+			expect(
+				await amm.getSwapEstimateOut(token0.address, amountInToken0)
+			).to.eql(amountReceiveToken1);
+		});
+	});
+
+	describe("getSwapEstimateIn", function () {
+		it("Should get the right number of token", async function () {
+			const { amm, token0, token1 } = await loadFixture(
+				deployContractWithLiquidity
+			);
+
+			const totalToken0 = await amm.totalAmount(token0.address);
+			const totalToken1 = await amm.totalAmount(token1.address);
+
+			const amountOutToken1 = ethers.utils.parseEther("10");
+			// basic formula: k = x * y
+			// fee = 0.3%
+			const amountInToken0 = totalToken0
+				.mul(amountOutToken1)
+				.mul(1000)
+				.div(totalToken1.sub(amountOutToken1).mul(997));
+
+			expect(
+				await amm.getSwapEstimateIn(token1.address, amountOutToken1)
+			).to.eql(amountInToken0);
+		});
+
+		it("Should revert if the amount of out token exceed the total", async function () {
+			const { amm, token1, amountOwnerProvided1, amountOtherProvided1 } =
+				await loadFixture(deployContractWithLiquidity);
+
+			const amountSendToken1 = amountOwnerProvided1
+				.add(amountOtherProvided1)
+				.add(1);
+
+			await expect(
+				amm.getSwapEstimateIn(token1.address, amountSendToken1)
+			).to.be.revertedWith("Insufficient pool balance");
+		});
+	});
+
+	describe("swap", function () {
+		it("Should set the right number of amm details", async function () {
+			const {
+				amm,
+				token0,
+				amountOwnerProvided0,
+				amountOtherProvided0,
+				token1,
+				amountOwnerProvided1,
+				amountOtherProvided1,
+			} = await loadFixture(deployContractWithLiquidity);
+
+			const amountSendToken0 = ethers.utils.parseEther("10");
+			const amountReceiveToken1 = await amm.getSwapEstimateOut(
+				token0.address,
+				amountSendToken0
+			);
+
+			await token0.approve(amm.address, amountSendToken0);
+			await amm.swap(token0.address, token1.address, amountSendToken0);
+
+			expect(await amm.totalAmount(token0.address)).to.equal(
+				amountOwnerProvided0.add(amountOtherProvided0).add(amountSendToken0)
+			);
+			expect(await amm.totalAmount(token1.address)).to.equal(
+				amountOwnerProvided1.add(amountOtherProvided1).sub(amountReceiveToken1)
+			);
+		});
+
+		it("Token should be moved", async function () {
+			const { amm, token0, token1, owner } = await loadFixture(
+				deployContractWithLiquidity
+			);
+
+			const ownerBalance0Before = await token0.balanceOf(owner.address);
+			const ownerBalance1Before = await token1.balanceOf(owner.address);
+
+			const ammBalance0Before = await token0.balanceOf(amm.address);
+			const ammBalance1Before = await token1.balanceOf(amm.address);
+
+			const amountSendToken0 = ethers.utils.parseEther("10");
+			const amountReceiveToken1 = await amm.getSwapEstimateOut(
+				token0.address,
+				amountSendToken0
+			);
+
+			await token0.approve(amm.address, amountSendToken0);
+			await amm.swap(token0.address, token1.address, amountSendToken0);
+
+			expect(await token0.balanceOf(owner.address)).to.eql(
+				ownerBalance0Before.sub(amountSendToken0)
+			);
+			expect(await token1.balanceOf(owner.address)).to.eql(
+				ownerBalance1Before.add(amountReceiveToken1)
+			);
+
+			expect(await token0.balanceOf(amm.address)).to.eql(
+				ammBalance0Before.add(amountSendToken0)
+			);
+			expect(await token1.balanceOf(amm.address)).to.eql(
+				ammBalance1Before.sub(amountReceiveToken1)
 			);
 		});
 	});

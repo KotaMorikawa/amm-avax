@@ -1,16 +1,18 @@
+"use client";
+
 import { useContract } from "@/hooks/useContract";
 import { useState } from "react";
 import Details from "./Details";
 import Faucet from "./Faucet";
 import Provide from "./Provide";
+import { useWallet } from "@/hooks/useWallet";
+import Swap from "./Swap";
+import Withdraw from "./Withdraw";
 
-type Props = {
-	currentAccount: string | undefined;
-};
-
-const Container = ({ currentAccount }: Props) => {
+const Container = () => {
 	const [activeTab, setActiveTab] = useState<string>("Swap");
 	const [updateDetailsFlag, setUpdateDetailsFlag] = useState<number>(0);
+	const { currentAccount, connectWallet } = useWallet();
 	const { usdc: token0, joe: token1, amm } = useContract(currentAccount);
 
 	const changeTab = (tab: string) => {
@@ -53,7 +55,15 @@ const Container = ({ currentAccount }: Props) => {
 					</div>
 				</div>
 
-				{activeTab === "Swap" && <div>swap</div>}
+				{activeTab === "Swap" && (
+					<Swap
+						token0={token0}
+						token1={token1}
+						amm={amm}
+						currentAccount={currentAccount}
+						updateDetails={updateDetails}
+					/>
+				)}
 				{activeTab === "Provide" && (
 					<Provide
 						token0={token0}
@@ -63,7 +73,15 @@ const Container = ({ currentAccount }: Props) => {
 						updateDetails={updateDetails}
 					/>
 				)}
-				{activeTab === "Withdraw" && <div>withdraw</div>}
+				{activeTab === "Withdraw" && (
+					<Withdraw
+						token0={token0}
+						token1={token1}
+						amm={amm}
+						currentAccount={currentAccount}
+						updateDetails={updateDetails}
+					/>
+				)}
 				{activeTab === "Faucet" && (
 					<Faucet
 						token0={token0}

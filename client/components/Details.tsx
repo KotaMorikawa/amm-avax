@@ -38,7 +38,7 @@ const Details = ({
 		try {
 			setAmountOfUserTokens([]);
 			for (let i = 0; i < tokens.length; i++) {
-				const amountInWei = tokens[i].contract.balanceOf(currentAccount);
+				const amountInWei = await tokens[i].contract.balanceOf(currentAccount);
 				const amountInEther = ethers.utils.formatEther(amountInWei);
 				setAmountOfUserTokens((prevState) => [...prevState, amountInEther]);
 			}
