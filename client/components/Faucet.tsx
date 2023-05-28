@@ -57,7 +57,7 @@ const Faucet = ({ token0, token1, currentAccount, updateDetails }: Props) => {
 	};
 
 	return (
-		<div className="mx-auto w-72 bg-gray-900 rounded-b-lg">
+		<div className="mx-auto bg-gray-900 rounded-b-lg p-5">
 			<div className="flex justify-center items-center p-2">
 				<div
 					className="bg-blue-500 text-white px-4 py-2 rounded"

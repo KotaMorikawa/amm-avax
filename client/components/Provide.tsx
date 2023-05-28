@@ -119,7 +119,7 @@ const Provide = ({
 	};
 
 	return (
-		<div className="mx-auto w-72 bg-gray-900 rounded-b-lg">
+		<div className="mx-auto bg-gray-900 rounded-b-lg p-5">
 			<InputNumberBox
 				leftHeader={`Amount of ${token0 ? token0.symbol : "some token"}`}
 				right={token0 ? token0.symbol : ""}
@@ -133,7 +133,7 @@ const Provide = ({
 					)
 				}
 			/>
-			<div className="w-10 text-center mx-auto">
+			<div className="w-10 text-center mx-auto my-3">
 				<MdAdd className="text-red-600" />
 			</div>
 			<InputNumberBox

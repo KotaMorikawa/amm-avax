@@ -120,14 +120,14 @@ const Swap = ({
 	};
 
 	return (
-		<div className="mx-auto w-72 bg-gray-900 rounded-b-lg">
+		<div className="mx-auto bg-gray-900 rounded-b-lg p-5">
 			<InputNumberBox
 				leftHeader="From"
 				right={tokenIn ? tokenIn.symbol : ""}
 				value={amountIn}
 				onChange={(e) => onChangeIn(e.target.value)}
 			/>
-			<div className="w-10 text-center mx-auto" onClick={() => rev()}>
+			<div className="w-10 text-center mx-auto my-3" onClick={() => rev()}>
 				<MdSwapVert className="text-red-600" />
 			</div>
 			<InputNumberBox

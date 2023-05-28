@@ -24,31 +24,29 @@ const Container = () => {
 	};
 
 	return (
-		<div className="flex">
+		<div className="flex mt-10">
 			<div className="m-auto">
-				<div className="flex justify-between select-none bg-gray-900 rounded-tl-2xl rounded-tr-2xl">
+				<div className="flex justify-between select-none bg-gray-900">
 					<div
-						className={`tabStyle ${activeTab === "Swap" ? "activeTab" : ""}`}
+						className={`p-3 ${activeTab === "Swap" ? "bg-gray-500" : ""}`}
 						onClick={() => changeTab("Swap")}
 					>
 						Swap
 					</div>
 					<div
-						className={`tabStyle ${activeTab === "Provide" ? "activeTab" : ""}`}
+						className={`p-3 ${activeTab === "Provide" ? "bg-gray-500" : ""}`}
 						onClick={() => changeTab("Provide")}
 					>
 						Provide
 					</div>
 					<div
-						className={`tabStyle ${
-							activeTab === "Withdraw" ? "activeTab" : ""
-						}`}
+						className={`p-3 ${activeTab === "Withdraw" ? "bg-gray-500" : ""}`}
 						onClick={() => changeTab("Withdraw")}
 					>
 						Withdraw
 					</div>
 					<div
-						className={`tabStyle ${activeTab === "Faucet" ? "activeTab" : ""}`}
+						className={`p-3 ${activeTab === "Faucet" ? "bg-gray-500" : ""}`}
 						onClick={() => changeTab("Faucet")}
 					>
 						Faucet
