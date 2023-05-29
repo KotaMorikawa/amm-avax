@@ -59,7 +59,7 @@ const Swap = ({
 	};
 
 	const getSwapEstimateIn = async (amount: string) => {
-		if (!amm || tokenOut) return;
+		if (!amm || !tokenOut) return;
 		if (!validAmount(amount)) return;
 		if (amm) {
 			try {

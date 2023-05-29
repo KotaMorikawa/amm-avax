@@ -1,4 +1,4 @@
-import { BigNumber, Contract, ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
 
 import { USDCToken as UsdcContractType } from "@/typechain-types";
@@ -51,7 +51,7 @@ export const useContract = (
 			return;
 		}
 		try {
-			const provider = new ethers.providers.Web3Provider(ethereum);
+			const provider = new ethers.providers.Web3Provider(ethereum as any);
 			const signer = provider.getSigner();
 			const Contract = new ethers.Contract(contractAddress, abi, signer);
 			storeContract(Contract);
